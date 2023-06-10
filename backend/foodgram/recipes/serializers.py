@@ -43,7 +43,7 @@ class IngredientRecipesSerializer(serializers.ModelSerializer):
 
 
 class RecipeReadSerializer(serializers.ModelSerializer):
-    tag = TagSerializer(many=True, read_only=True)
+    tags = TagSerializer(many=True, read_only=True)
     author = UserSerializer(read_only=True)
     image = Base64ImageField()
     ingredients = IngredientRecipesSerializer(
@@ -64,8 +64,8 @@ class RecipeReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipes
         fields = (
-            'id', 'author', 'ingredients', 'tag',
-            'description', 'is_in_shopping_cart',
+            'id', 'author', 'ingredients', 'tags',
+            'text', 'is_in_shopping_cart',
             'is_favorited', 'name', 'cooking_time', 'image')
 
 
@@ -90,9 +90,9 @@ class RecipeEditSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredients')
-        tag = validated_data.pop('tag')
+        tags = validated_data.pop('tags')
         recipe = Recipes.objects.create(**validated_data)
-        recipe.tag.set(tag)
+        recipe.tags.set(tags)
         self.create_ingredients(ingredients, recipe)
         return recipe
 
@@ -101,14 +101,12 @@ class RecipeEditSerializer(serializers.ModelSerializer):
             ingredients = validated_data.pop('ingredients')
             instance.ingredients.clear()
             self.create_ingredients(ingredients, instance)
-        if 'tag' in validated_data:
-            instance.tag.set(validated_data.pop('tag'))
+        if 'tags' in validated_data:
+            instance.tags.set(validated_data.pop('tags'))
             return super().update(instance, validated_data)
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
-    is_favorite = serializers.BooleanField(read_only=True)
-
     id = serializers.ReadOnlyField(
         source='recipes.id',
     )
@@ -135,7 +133,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Favorites
-        fields = ('id', 'name', 'image', 'cooking_time', 'is_favorite')
+        fields = ('id', 'name', 'image', 'cooking_time')
 
 
 class SubscriptionRecipeSerializer(serializers.ModelSerializer):

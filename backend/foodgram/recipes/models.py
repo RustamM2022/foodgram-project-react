@@ -1,6 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
-from django.core.validators import MinValueValidator, RegexValidator
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models.expressions import F
 
@@ -12,9 +11,7 @@ class Tag(models.Model):
     color = models.CharField(max_length=7)
     slug = models.SlugField(
         max_length=200,
-        unique=True,
-        validators=[RegexValidator(regex=r'^[-a-zA-Z0-9_]+$',
-                    message='Некорректный slug.')]
+        unique=True
     )
 
     class Meta:
@@ -47,21 +44,22 @@ class Recipes(models.Model):
     image = models.ImageField(
         verbose_name='Изображение',
         help_text='Загрузите изображение для вашего рецепта',
-        upload_to='images/',
-        blank=False,
-        null=False
+        upload_to='images/'
     )
-    description = models.TextField(blank=True, null=True)
+    text = models.TextField('Описание рецепта')
     ingredients = models.ManyToManyField(
         Ingredient,
         through='RecipeIngredient'
     )
-    tag = models.ManyToManyField(
+    tags = models.ManyToManyField(
         Tag,
         verbose_name='тег'
     )
-    cooking_time = models.PositiveIntegerField(
-        verbose_name='Время приготовления')
+    cooking_time = models.PositiveSmallIntegerField(
+        verbose_name='Время приготовления',
+        validators=[MinValueValidator(1)]
+    )
+
     pub_date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -85,7 +83,7 @@ class RecipeIngredient(models.Model):
         on_delete=models.CASCADE,
         related_name='recipe'
     )
-    amount = models.PositiveIntegerField(
+    amount = models.PositiveSmallIntegerField(
         'Количество',
         validators=[MinValueValidator(1)]
         )
@@ -115,6 +113,12 @@ class Favorites(models.Model):
         verbose_name = 'Избранный рецепт'
         verbose_name_plural = 'Избранные рецепты'
         ordering = ['id']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['favorite_recipe', 'user'],
+                name='Проверка дублирования избранного рецепта'
+            )
+        ]
 
 
 class Subscription(models.Model):
@@ -131,10 +135,6 @@ class Subscription(models.Model):
         verbose_name='автор рецептов'
     )
     created = models.DateTimeField(auto_now_add=True)
-
-    def clean(self):
-        if self.user == self.author:
-            raise ValidationError('Подписка на себя запрещена!')
 
     class Meta:
         verbose_name = 'Подписка'

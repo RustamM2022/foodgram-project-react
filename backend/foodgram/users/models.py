@@ -6,9 +6,8 @@ class User(AbstractUser):
     username = models.CharField(max_length=150, unique=True)
     first_name = models.CharField(max_length=150, blank=True)
     last_name = models.CharField(max_length=150, blank=True)
-    email = models.EmailField(max_length=254, blank=True)
-    is_subscribed = models.BooleanField(default=False)
-    REQUIRED_FIELDS = ['first_name', 'last_name', 'email', 'is_subscribed']
+    email = models.EmailField(max_length=254, blank=True, unique=True)
+    REQUIRED_FIELDS = ['first_name', 'last_name', 'email']
 
     class Meta:
         verbose_name = 'Пользователи'

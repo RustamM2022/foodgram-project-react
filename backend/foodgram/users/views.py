@@ -2,10 +2,10 @@ from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
 from recipes.models import Subscription
+from recipes.pagination import CustomPagination
 from recipes.serializers import (SubscriptionReadSerializer,
                                  SubscriptionSerializer)
 from users.models import User
@@ -16,7 +16,7 @@ from .serializers import (SetPasswordSerializer, UserCreateSerializer,
 
 class CustomUserViewSet(UserViewSet):
     queryset = User.objects.all()
-    pagination_class = PageNumberPagination
+    pagination_class = CustomPagination
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_serializer_class(self):
@@ -29,7 +29,14 @@ class CustomUserViewSet(UserViewSet):
     @action(methods=['get'], detail=False, permission_classes=(
             permissions.IsAuthenticated,))
     def subscriptions(self, request):
-        queryset = User.objects.filter(following__user=request.user)
+        queryset = User.objects.filter(following__user=request.user) # не смог реализовать, в другой итерации исправлю
+        # # queryset = User.objects.filter(follower=request.user.following.all())
+        # queryset = User.objects.filter(following=request.user.follower)
+        # # queryset = request.user.following.all()
+        # print(queryset)        
+        # print(User.objects.filter(username=request.user.following))
+        # print(User.objects.filter(following__user=request.user))
+        # print(request.user, request.user.following.all(), request.user.follower.all())
         page = self.paginate_queryset(queryset)
         serializer = SubscriptionReadSerializer(page,
                                                 many=True,

@@ -20,7 +20,8 @@ class UserSerializer(UserSerializer):
 
     class Meta:
         fields = (
-            'username', 'email', 'first_name', 'last_name', 'is_subscribed')
+            'id', 'username', 'email', 'first_name',
+            'last_name', 'is_subscribed')
         model = User
 
 
