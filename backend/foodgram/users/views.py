@@ -29,14 +29,7 @@ class CustomUserViewSet(UserViewSet):
     @action(methods=['get'], detail=False, permission_classes=(
             permissions.IsAuthenticated,))
     def subscriptions(self, request):
-        queryset = User.objects.filter(following__user=request.user) # не смог реализовать, в другой итерации исправлю
-        # # queryset = User.objects.filter(follower=request.user.following.all())
-        # queryset = User.objects.filter(following=request.user.follower)
-        # # queryset = request.user.following.all()
-        # print(queryset)        
-        # print(User.objects.filter(username=request.user.following))
-        # print(User.objects.filter(following__user=request.user))
-        # print(request.user, request.user.following.all(), request.user.follower.all())
+        queryset = User.objects.filter(following__user=request.user)
         page = self.paginate_queryset(queryset)
         serializer = SubscriptionReadSerializer(page,
                                                 many=True,
@@ -68,5 +61,4 @@ class SubscriptionViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
         if request.method == 'DELETE':
             get_object_or_404(Subscription, user=request.user,
                               author=author).delete()
-            return Response({'detail': 'Успешная отписка'},
-                            status=status.HTTP_204_NO_CONTENT)
+            return Response(status=status.HTTP_204_NO_CONTENT)

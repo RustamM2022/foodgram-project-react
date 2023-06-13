@@ -46,7 +46,7 @@ class RecipesViewSet(viewsets.ModelViewSet):
         shopping_list = [f'Список покупок пользователя: {user.username}']
         ingredients = Ingredient.objects.filter(
             ingredient__recipe__shopping_recipes__user=user
-            ).values('name', 'measurement_unit').annotate(
+        ).values('name', 'measurement_unit').annotate(
             amount=Sum('ingredient__amount'))
         for _ in ingredients:
             shopping_list.append(
@@ -84,8 +84,7 @@ class FavoriteViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_recipes(self):
-        recipes = get_object_or_404(Recipes, id=self.kwargs.get('recipes_id'))
-        return recipes
+        return get_object_or_404(Recipes, id=self.kwargs.get('recipes_id'))
 
     def perform_create(self, serializer):
         serializer.is_valid(raise_exception=True)
@@ -98,7 +97,6 @@ class FavoriteViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
             Favorites.objects.get(user=request.user,
                                   favorite_recipe_id=recipes_id).delete()
             return Response(
-                {'message': 'Рецепт удален из избранного'},
                 status=status.HTTP_204_NO_CONTENT)
         except Favorites.DoesNotExist:
             return Response(
@@ -127,7 +125,6 @@ class ShoppingListViewSet(CreateListDestroyViewSet):
                 user=request.user, recipe=get_object_or_404(
                     Recipes, id=self.kwargs.get('recipes_id'))).delete()
             return Response(
-                {'message': 'Рецепт удален из списка покупок'},
                 status=status.HTTP_204_NO_CONTENT)
         except ShoppingList.DoesNotExist:
             return Response(

@@ -25,7 +25,7 @@ class Ingredient(models.Model):
     measurement_unit = models.CharField(
         max_length=200,
         verbose_name='Единица измерения',
-        )
+    )
 
     class Meta:
         verbose_name = 'Ингредиент'
@@ -86,7 +86,7 @@ class RecipeIngredient(models.Model):
     amount = models.PositiveSmallIntegerField(
         'Количество',
         validators=[MinValueValidator(1)]
-        )
+    )
 
     class Meta:
         verbose_name = 'Ингредиент рецепта'

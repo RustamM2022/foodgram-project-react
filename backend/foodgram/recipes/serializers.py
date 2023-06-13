@@ -103,7 +103,16 @@ class RecipeEditSerializer(serializers.ModelSerializer):
             self.create_ingredients(ingredients, instance)
         if 'tags' in validated_data:
             instance.tags.set(validated_data.pop('tags'))
-            return super().update(instance, validated_data)
+        return super().update(instance, validated_data)
+
+    def validate(self, data):
+        ingredients = data.get('ingredients')
+        if len(ingredients) != len(set(
+                [ingredient['id'] for ingredient in ingredients])):
+            raise serializers.ValidationError(
+                'Ингредиент не должен повторяться'
+            )
+        return data
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
@@ -125,7 +134,8 @@ class FavoriteSerializer(serializers.ModelSerializer):
         user = self.context.get('request').user
         favorite_recipe_id = self.context.get('view').kwargs.get('recipes_id')
         if Favorites.objects.filter(
-                    user=user, favorite_recipe=favorite_recipe_id).exists():
+            user=user,
+                favorite_recipe=favorite_recipe_id).exists():
             raise serializers.ValidationError(
                 'Рецепт уже в избранном'
             )
