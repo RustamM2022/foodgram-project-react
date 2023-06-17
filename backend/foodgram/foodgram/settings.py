@@ -36,7 +36,6 @@ ALLOWED_HOSTS = [
     'db'
 ]
 
-
 # Application definition
 
 INSTALLED_APPS = [
