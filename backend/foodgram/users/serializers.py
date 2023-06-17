@@ -4,6 +4,7 @@ from djoser.serializers import (PasswordSerializer, UserCreateSerializer,
                                 UserSerializer)
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
+
 from recipes.models import Subscription
 from users.models import User
 
