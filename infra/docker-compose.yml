@@ -21,6 +21,9 @@ services:
     image: mulrustam/infra-frontend:latest
     volumes:
       - ../frontend/:/app/result_build/
+    depends_on:
+      - backend
+  
   nginx:
     image: nginx:1.19.3
     ports:
@@ -31,6 +34,9 @@ services:
       - media_value:/var/html/media/
       - ../frontend/build:/usr/share/nginx/html/
       - ./docs/:/usr/share/nginx/html/api/docs/
+    depends_on:
+      - frontend
+
 
 volumes:
   static_value:
