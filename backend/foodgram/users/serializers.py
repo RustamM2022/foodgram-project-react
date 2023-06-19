@@ -59,3 +59,4 @@ class SetPasswordSerializer(PasswordSerializer):
             raise serializers.ValidationError(
                 'Пароль не изменился'
             )
+        return data

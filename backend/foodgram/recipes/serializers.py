@@ -112,6 +112,10 @@ class RecipeEditSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'Ингредиент не должен повторяться'
             )
+        if any(obj['amount'] <= 0 for obj in ingredients):
+            raise serializers.ValidationError(
+                'Количество ингредиент должен быть больше нуля'
+            )
         return data
 
 
