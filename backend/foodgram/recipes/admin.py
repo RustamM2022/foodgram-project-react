@@ -4,10 +4,22 @@ from recipes.models import (Favorites, Ingredient, RecipeIngredient, Recipes,
                             ShoppingList, Tag)
 
 
+class IngredientInline(admin.StackedInline):
+    model = RecipeIngredient
+
+
 class RecipesAdmin(admin.ModelAdmin):
-    list_display = ('name', 'author')
+    list_display = ('name', 'author', 'get_favorite_recipe_count')
     list_display_links = ('name', )
     list_filter = ('name', 'author', 'tags')
+    inlines = [
+        IngredientInline,
+    ]
+
+    def get_favorite_recipe_count(self, obj):
+        return obj.recipes.count()
+
+    get_favorite_recipe_count.short_description = 'В избранном'
 
 
 class IngredientAdmin(admin.ModelAdmin):
